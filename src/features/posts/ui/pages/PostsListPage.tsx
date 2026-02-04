@@ -1,20 +1,20 @@
 import {Post} from "../components/Post.tsx";
-import {useQuery} from "@tanstack/react-query";
 import type {PostType} from "../../model/post.type.ts";
-import type {PaginatorType} from "../../../../shared/types/paginator.type.ts";
 import {Link} from "react-router-dom";
-import {postsApi} from "../../api/posts.api.ts";
+import {useGetAllPostsQuery} from "../../api/post.api.ts";
 
 
 export function PostsListPage() {
 
-    const {data, isLoading, error} = useQuery<PaginatorType<PostType>>({
-        queryKey: ['users'],
-        queryFn: () => postsApi.getAll()
-    });
+    const {
+        data,
+        isLoading,
+        error
+    } = useGetAllPostsQuery();
+
 
     if (isLoading) return <div>LOADING...</div>;
-    if (error) return <div>ERROR: {error.message}</div>;
+    if (error) return <div>ERROR</div>;
 
     return (
         <div>

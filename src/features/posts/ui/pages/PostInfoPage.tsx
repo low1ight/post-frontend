@@ -1,36 +1,24 @@
 import {Post} from "../components/Post.tsx";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import type {PostType} from "../../model/post.type.ts";
 import {Link, useParams} from "react-router-dom";
-import {postsApi} from "../../api/posts.api.ts";
 import { useNavigate } from 'react-router-dom';
+import {useDeletePostByIdMutation, useGetPostByIdQuery} from "../../api/post.api.ts";
 
 export function PostInfoPage() {
 
     const {id} = useParams<{ id: string }>();
-    const queryClient = useQueryClient();
     const navigate = useNavigate();
 
-    const {data, isLoading, error} = useQuery<PostType>({
-        queryKey: ['post', id],
-        queryFn: () => postsApi.getById(id!),
-    });
+    const {data, isLoading, error} = useGetPostByIdQuery(id!)
+    const [deletePost] = useDeletePostByIdMutation()
 
 
-    const onDelete = useMutation({
-
-        mutationFn: () => postsApi.deleteById(id!),
-        onSuccess: () => {
-            queryClient.removeQueries({ queryKey: ['post', id] });
-            navigate('/');
-        },
-        onError: (error) => {
-            console.error("Deleting Error:", error);
-        }
-    });
+    const onDeletePost = async () => {
+        await deletePost(id!)
+        navigate('/posts')
+    }
 
     if (isLoading) return <div>LOADING...</div>;
-    if (error) return <div>ERROR:{error.message}</div>;
+    if (error) return <div>ERROR</div>;
     if (!data) return <div>404 NOT FOUND</div>;
 
     return (<div >
@@ -38,7 +26,7 @@ export function PostInfoPage() {
                 <Link to={`/posts/`}><p>back</p></Link>
                 <div className="grid grid-cols-2 gap-x-5">
                     <button onClick={() => navigate(`/posts/${id}/update`)}> update </button>
-                    <button onClick={() => onDelete.mutate()}> {onDelete.isPending ? "DELETING.." : "delete"} </button>
+                    <button onClick={onDeletePost}> delete</button>
                 </div>
 
             </nav>

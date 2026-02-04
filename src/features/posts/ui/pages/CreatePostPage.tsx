@@ -1,13 +1,15 @@
 import {defaultValues, type PostFormValues, postSchema} from "../../model/validators/post.validator.ts";
 import {FormProvider, type SubmitHandler, useForm} from "react-hook-form";
-import {postsApi} from "../../api/posts.api.ts";
 import {useNavigate} from "react-router-dom";
 import {PostForm} from "../components/PostForm.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
+import {useCreatePostMutation} from "../../api/post.api.ts";
 
 export function CreatePostPage() {
 
     const navigate = useNavigate();
+
+    const [createPost] = useCreatePostMutation()
 
     const form = useForm<PostFormValues>({
         resolver: yupResolver(postSchema),
@@ -15,12 +17,14 @@ export function CreatePostPage() {
     });
 
     const onSubmit: SubmitHandler<PostFormValues> = async (data) => {
-        const createdPostId = await postsApi.createPost(data)
-        if(createdPostId) {
-            navigate(`/posts/${createdPostId}`);
+        try {
+           const result = await createPost(data)
+           navigate(`/posts/${result.data}`);
+        } catch (error) {
+            console.log(error)
         }
+    }
 
-    };
 
     return (
         <FormProvider {...form}>
