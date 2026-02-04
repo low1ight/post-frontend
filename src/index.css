@@ -1,2 +1,7 @@
 @import "tailwindcss";
 
+@layer components {
+    .card-dark {
+        @apply bg-[#232327] rounded-xl border border-white/10 mt-10;
+    }
+}
