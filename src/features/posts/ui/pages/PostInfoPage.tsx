@@ -1,7 +1,9 @@
 import {Post} from "../components/Post.tsx";
-import {Link, useParams} from "react-router-dom";
-import { useNavigate } from 'react-router-dom';
+import {useParams} from "react-router-dom";
+import {useNavigate} from 'react-router-dom';
 import {useDeletePostByIdMutation, useGetPostByIdQuery} from "../../api/post.api.ts";
+import Button from "../../../../shared/ui/Button.tsx";
+import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 
 export function PostInfoPage() {
 
@@ -9,7 +11,7 @@ export function PostInfoPage() {
     const navigate = useNavigate();
 
     const {data, isLoading, error} = useGetPostByIdQuery(id!)
-    const [deletePost] = useDeletePostByIdMutation()
+    const [deletePost, del] = useDeletePostByIdMutation()
 
 
     const onDeletePost = async () => {
@@ -21,22 +23,35 @@ export function PostInfoPage() {
     if (error) return <div>ERROR</div>;
     if (!data) return <div>404 NOT FOUND</div>;
 
-    return (<div >
-            <nav className="flex py-5 justify-between">
-                <Link to={`/posts/`}><p>back</p></Link>
-                <div className="grid grid-cols-2 gap-x-5">
-                    <button onClick={() => navigate(`/posts/${id}/update`)}> update </button>
-                    <button onClick={onDeletePost}> delete</button>
-                </div>
+    return (
+        <div>
 
+            <nav className="flex justify-between pb-3">
+                <ReturnLink name={"← Back to Posts list"} to={'/posts'}/>
+                <div className="grid grid-cols-2 gap-x-5">
+
+                    <Button type={"button"}
+                            variant={"secondary"}
+                            buttonName={"Update"}
+                            onClick={() => navigate(`/posts/${id}/update`)}/>
+
+                    <Button type={"button"}
+                            variant={"danger"}
+                            buttonName={"Delete"}
+                            isSubmitting={del.isLoading}
+                            submittingText={"Deleting..."}
+                            onClick={onDeletePost}/>
+                </div>
             </nav>
-            <div className="grid grid-cols-1 gap-y-5">
+
+            <div>
                 <Post
                     key={data.id}
                     title={data.title}
                     description={data.description}
                     content={data.content}/>
             </div>
+
         </div>
 
     )
