@@ -6,6 +6,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {useGetPostByIdQuery, useUpdatePostByIdMutation} from "../../api/post.api.ts";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 import {NotFound} from "../../../../shared/ui/NotFound.tsx";
+import toast from "react-hot-toast";
 
 export function UpdatePostPage() {
 
@@ -34,8 +35,13 @@ export function UpdatePostPage() {
         try {
             await updatePost({...data, id: id!})
             navigate(`/posts/${id}`);
+            toast.success("Updated!")
         } catch (error) {
-            console.log(error);
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
         }
     };
 

@@ -5,6 +5,7 @@ import {PostForm} from "../components/PostForm.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useCreatePostMutation} from "../../api/post.api.ts";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
+import toast from "react-hot-toast";
 
 export function CreatePostPage() {
 
@@ -21,8 +22,13 @@ export function CreatePostPage() {
         try {
             const result = await createPost(data)
             navigate(`/posts/${result.data}`);
+            toast.success("Created!")
         } catch (error) {
-            console.log(error)
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
         }
     }
 

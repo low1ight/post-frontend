@@ -8,6 +8,7 @@ import {PostSkeleton} from "../components/skeleton/PostSkeleton.tsx";
 import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 import {ActionModal} from "../../../../shared/ui/ActionModal.tsx";
 import {useState} from "react";
+import toast from "react-hot-toast";
 
 export function PostInfoPage() {
 
@@ -21,11 +22,21 @@ export function PostInfoPage() {
 
 
     const onDeletePost = async () => {
-        await deletePost(id!)
-        navigate('/posts')
+        try {
+
+            await deletePost(id!)
+            navigate('/posts')
+            toast.success("Deleted")
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("An unexpected error occurred");
+            }
+        }
     }
 
-    if (!isLoading && !data || error) return <NotFound />;
+    if (!isLoading && !data || error) return <NotFound/>;
 
     return (
         <div>
@@ -58,12 +69,12 @@ export function PostInfoPage() {
 
             <div>
                 {isLoading ?
-                    <PostSkeleton /> :
+                    <PostSkeleton/> :
                     <Post
-                    key={data.id}
-                    title={data.title}
-                    description={data.description}
-                    content={data.content}/>}
+                        key={data.id}
+                        title={data.title}
+                        description={data.description}
+                        content={data.content}/>}
 
             </div>
 

@@ -6,12 +6,14 @@ import {PostInfoPage} from "./features/posts/ui/pages/PostInfoPage.tsx";
 import {CreatePostPage} from "./features/posts/ui/pages/CreatePostPage.tsx";
 import {UpdatePostPage} from "./features/posts/ui/pages/UpdatePostPage.tsx";
 import {NotFound} from "./shared/ui/NotFound.tsx";
+import {Toaster} from "react-hot-toast";
 
 
 function App() {
 
     return (
         <>
+            <Toaster/>
             <Header/>
             <main className="min-w-[320px] max-w-4xl mx-auto px-8 py-6">
                 <Routes>
