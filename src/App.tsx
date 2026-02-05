@@ -5,6 +5,7 @@ import {PostsListPage} from "./features/posts/ui/pages/PostsListPage.tsx";
 import {PostInfoPage} from "./features/posts/ui/pages/PostInfoPage.tsx";
 import {CreatePostPage} from "./features/posts/ui/pages/CreatePostPage.tsx";
 import {UpdatePostPage} from "./features/posts/ui/pages/UpdatePostPage.tsx";
+import {NotFound} from "./shared/ui/NotFound.tsx";
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                     <Route path="/posts/:id" element={<PostInfoPage/>}/>
                     <Route path="/posts/new" element={<CreatePostPage/>}/>
                     <Route path="/posts/:id/update" element={<UpdatePostPage/>}/>
+                    <Route path="*" element={<NotFound/>}/>
                 </Routes>
             </main>
         </>
