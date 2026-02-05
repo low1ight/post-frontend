@@ -53,8 +53,7 @@ export const postsApi = baseApi.injectEndpoints({
                 url: `posts/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: (result, error, id:string) =>
-                [{ type: 'Posts', id }],
+            invalidatesTags: [{ type: 'Posts', id: 'LIST' }]
         }),
 
         updatePostById: builder.mutation<{success:boolean}, UpdatePostType>({
