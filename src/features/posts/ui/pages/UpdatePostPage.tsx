@@ -4,6 +4,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {PostForm} from "../components/PostForm.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useGetPostByIdQuery, useUpdatePostByIdMutation} from "../../api/post.api.ts";
+import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 
 export function UpdatePostPage() {
 
@@ -23,10 +24,9 @@ export function UpdatePostPage() {
         } : defaultValues,
     });
 
-    if(isLoading) return <div>Loading</div>;
-    if(error) return <div>Error</div>;
-    if(!data) return <div>NOT FOUND</div>
-
+    if (isLoading) return <div>Loading</div>;
+    if (error) return <div>Error</div>;
+    if (!data) return <div>NOT FOUND</div>
 
 
     const onSubmit: SubmitHandler<PostFormValues> = async (data) => {
@@ -39,9 +39,14 @@ export function UpdatePostPage() {
     };
 
     return (
-        <FormProvider {...form}>
-            <PostForm formName={"Update Post"} submitButtonName={"Update"} onSubmit={onSubmit} />
-        </FormProvider>
+        <div className="max-w-lg mx-auto">
+            <nav className="mb-3">
+                <ReturnLink name={"← Return"} to={`/posts/${id}`}/>
+            </nav>
+            <FormProvider {...form}>
+                <PostForm formName={"Update Post"} submittingText={"Updating"} submitButtonName={"Update"} onSubmit={onSubmit}/>
+            </FormProvider>
+        </div>
     )
 
 }
