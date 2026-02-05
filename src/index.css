@@ -2,6 +2,21 @@
 
 @layer components {
     .card-dark {
-        @apply bg-[#232327] rounded-xl border border-white/10 mt-10;
+        @apply bg-[#232327] rounded-xl border border-white/10;
+    }
+    .form-label {
+        @apply block text-sm font-medium text-slate-400 mb-1
+    }
+    .form-input {
+        @apply w-full p-2 bg-transparent border rounded-lg text-white outline-none transition-colors
+    }
+    .form-input-error {
+        @apply border-red-500
+    }
+    .form-input-focus {
+        @apply border-white/10 focus:border-blue-500
+    }
+    .form-error-message {
+        @apply text-red-500 text-xs mt-1
     }
 }
