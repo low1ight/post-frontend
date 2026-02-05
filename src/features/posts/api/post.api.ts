@@ -4,11 +4,16 @@ import type {PaginatorType} from "../../../shared/types/paginator.type.ts";
 import type {CreatePostType} from "../model/types/createPost.type.ts";
 import type {UpdatePostType} from "../model/types/updatePost.type.ts";
 
+
+type GetAllPostsQuery = {
+    titleSearchTerm: string
+}
+
 export const postsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        getAllPosts: builder.query<PaginatorType<PostType>, void>({
-            query: () => 'posts',
+        getAllPosts: builder.query<PaginatorType<PostType>, GetAllPostsQuery>({
+            query: ({titleSearchTerm}:GetAllPostsQuery) => `posts?TitleSearchTerm=${titleSearchTerm}`,
             providesTags: (result) =>
                 result
                     ? [...result.items.map(({id}) => ({type: 'Posts' as const, id})), {type: 'Posts', id: 'LIST'}]

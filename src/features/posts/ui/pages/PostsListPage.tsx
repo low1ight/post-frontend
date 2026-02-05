@@ -2,15 +2,22 @@ import {Post} from "../components/Post.tsx";
 import type {PostType} from "../../model/post.type.ts";
 import {Link} from "react-router-dom";
 import {useGetAllPostsQuery} from "../../api/post.api.ts";
+import {AddNewPostFabButton} from "../components/AddNewPostFab.tsx";
+import {useState} from "react";
+import {useDebounce} from "../../../../shared/hooks/useDebounce.ts";
 
 
 export function PostsListPage() {
+
+    const [inputValue,setInputValue] = useState("")
+    const debounce = useDebounce(inputValue,500)
 
     const {
         data,
         isLoading,
         error
-    } = useGetAllPostsQuery();
+    } = useGetAllPostsQuery({titleSearchTerm:debounce});
+
 
 
     if (isLoading) return <div>LOADING...</div>;
@@ -18,10 +25,13 @@ export function PostsListPage() {
 
     return (
         <div>
-            <nav className="py-10 flex justify-center">
-                <Link to={"/posts/new"}>
-                    <button>ADD NEW POST</button>
-                </Link>
+            <AddNewPostFabButton/>
+            <nav className="py-5 flex justify-center">
+
+                     <input className="form-input" value={inputValue} onChange={(e) => setInputValue(e.target.value)} type="text"/>
+
+
+
             </nav>
 
             <div className="grid grid-cols-1 gap-y-5">
