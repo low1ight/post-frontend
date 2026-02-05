@@ -5,6 +5,7 @@ import {PostForm} from "../components/PostForm.tsx";
 import {yupResolver} from "@hookform/resolvers/yup";
 import {useGetPostByIdQuery, useUpdatePostByIdMutation} from "../../api/post.api.ts";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
+import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 
 export function UpdatePostPage() {
 
@@ -24,9 +25,9 @@ export function UpdatePostPage() {
         } : defaultValues,
     });
 
-    if (isLoading) return <div>Loading</div>;
-    if (error) return <div>Error</div>;
-    if (!data) return <div>NOT FOUND</div>
+    if (isLoading) return <div></div>;
+
+    if (!isLoading && !data || error) return <NotFound />
 
 
     const onSubmit: SubmitHandler<PostFormValues> = async (data) => {

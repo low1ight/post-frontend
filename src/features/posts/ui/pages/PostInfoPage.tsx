@@ -4,6 +4,8 @@ import {useNavigate} from 'react-router-dom';
 import {useDeletePostByIdMutation, useGetPostByIdQuery} from "../../api/post.api.ts";
 import Button from "../../../../shared/ui/Button.tsx";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
+import {PostSkeleton} from "../components/skeleton/PostSkeleton.tsx";
+import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 
 export function PostInfoPage() {
 
@@ -19,9 +21,7 @@ export function PostInfoPage() {
         navigate('/posts')
     }
 
-    if (isLoading) return <div>LOADING...</div>;
-    if (error) return <div>ERROR</div>;
-    if (!data) return <div>404 NOT FOUND</div>;
+    if (!isLoading && !data || error) return <NotFound />;
 
     return (
         <div>
@@ -33,11 +33,13 @@ export function PostInfoPage() {
                     <Button type={"button"}
                             variant={"secondary"}
                             buttonName={"Update"}
+                            disabled={isLoading}
                             onClick={() => navigate(`/posts/${id}/update`)}/>
 
                     <Button type={"button"}
                             variant={"danger"}
                             buttonName={"Delete"}
+                            disabled={isLoading}
                             isSubmitting={del.isLoading}
                             submittingText={"Deleting..."}
                             onClick={onDeletePost}/>
@@ -45,11 +47,14 @@ export function PostInfoPage() {
             </nav>
 
             <div>
-                <Post
+                {isLoading ?
+                    <PostSkeleton /> :
+                    <Post
                     key={data.id}
                     title={data.title}
                     description={data.description}
-                    content={data.content}/>
+                    content={data.content}/>}
+
             </div>
 
         </div>
