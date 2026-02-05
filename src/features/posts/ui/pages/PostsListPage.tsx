@@ -5,44 +5,69 @@ import {useGetAllPostsQuery} from "../../api/post.api.ts";
 import {AddNewPostFabButton} from "../components/AddNewPostFab.tsx";
 import {useState} from "react";
 import {useDebounce} from "../../../../shared/hooks/useDebounce.ts";
+import {Virtuoso} from "react-virtuoso";
+import {PostSkeleton} from "../components/skeleton/PostSkeleton.tsx";
+import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 
 
 export function PostsListPage() {
+    const PAGE_SIZE = 10;
 
-    const [inputValue,setInputValue] = useState("")
-    const debounce = useDebounce(inputValue,500)
+    const [inputValue, setInputValue] = useState("")
+    const debounce = useDebounce(inputValue, 500)
+
+    const [page, setPage] = useState(1);
+
 
     const {
         data,
         isLoading,
         error
-    } = useGetAllPostsQuery({titleSearchTerm:debounce});
+    } = useGetAllPostsQuery({titleSearchTerm: debounce, pageSize: PAGE_SIZE, pageNumber: page});
 
 
+    const isNewPageAvailable = data && Math.ceil(data.totalItemsCount / PAGE_SIZE) > page
 
-    if (isLoading) return <div>LOADING...</div>;
-    if (error) return <div>ERROR</div>;
+    const loadNextPage = () => {
+        if (!isLoading && isNewPageAvailable) setPage(page + 1)
+    }
+
+    if (!isLoading && !data || error) return <NotFound />;
 
     return (
         <div>
             <AddNewPostFabButton/>
             <nav className="py-5 flex justify-center">
-
-                     <input className="form-input" value={inputValue} onChange={(e) => setInputValue(e.target.value)} type="text"/>
-
-
-
+                <input className="form-input border-white/10 focus:border-white" disabled={isLoading} value={inputValue}
+                       onChange={(e) => setInputValue(e.target.value)}
+                       type="text"/>
             </nav>
 
-            <div className="grid grid-cols-1 gap-y-5">
-                {data?.items.map((post: PostType) =>
-                    <Link to={`/posts/${post.id}`} key={post.id}>
-                        <Post
-                            title={post.title}
-                            description={post.description}
-                            content={post.content}/>
-                    </Link>)}
-            </div>
+            {isLoading ?
+                [...Array(10)].map((_, i) => (
+
+                    <div className="mb-4">
+                        <PostSkeleton key={i}/>
+                    </div>))
+
+                :
+                <Virtuoso useWindowScroll
+                          style={{height: '100vh'}}
+                          data={data?.items || []}
+                          endReached={loadNextPage}
+                          itemContent={(index, post: PostType) => (
+                              <div className="mb-4">
+                                  <Link to={`/posts/${post.id}`} key={index}>
+                                      <Post
+                                          title={post.title}
+                                          description={post.description}
+                                          content={post.content}/>
+                                  </Link>
+                              </div>
+                          )}
+                />
+            }
+
         </div>
 
     )

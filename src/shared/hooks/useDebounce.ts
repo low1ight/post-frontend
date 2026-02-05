@@ -9,8 +9,5 @@ export function useDebounce(value:string, delay:number = 500) {
         return () => clearTimeout(timeoutId);
     },[value,delay]);
 
-
-
-    console.log(debouncedValue)
     return debouncedValue
 }

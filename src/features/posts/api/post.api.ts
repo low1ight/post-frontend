@@ -7,13 +7,26 @@ import type {UpdatePostType} from "../model/types/updatePost.type.ts";
 
 type GetAllPostsQuery = {
     titleSearchTerm: string
+    pageNumber: number
+    pageSize:number
 }
 
 export const postsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
         getAllPosts: builder.query<PaginatorType<PostType>, GetAllPostsQuery>({
-            query: ({titleSearchTerm}:GetAllPostsQuery) => `posts?TitleSearchTerm=${titleSearchTerm}`,
+            query: ({titleSearchTerm,pageSize,pageNumber}:GetAllPostsQuery) =>
+                `posts?TitleSearchTerm=${titleSearchTerm}&PageNumber=${pageNumber}&PageSize=${pageSize}`,
+            serializeQueryArgs: ({ endpointName }) => {
+                return endpointName;
+            },
+            merge: (currentCache, newItems) => {
+                currentCache.items.push(...newItems.items);
+                currentCache.pageNumber = newItems.pageNumber;
+            },
+            forceRefetch({ currentArg, previousArg }) {
+                return currentArg !== previousArg;
+            },
             providesTags: (result) =>
                 result
                     ? [...result.items.map(({id}) => ({type: 'Posts' as const, id})), {type: 'Posts', id: 'LIST'}]
