@@ -46,8 +46,8 @@ export function PostsListPage() {
             {isLoading ?
                 [...Array(10)].map((_, i) => (
 
-                    <div className="mb-4">
-                        <PostSkeleton key={i}/>
+                    <div className="mb-4" key={i}>
+                        <PostSkeleton/>
                     </div>))
 
                 :
