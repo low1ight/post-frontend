@@ -6,8 +6,12 @@ import Button from "../../../../shared/ui/Button.tsx";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 import {PostSkeleton} from "../components/skeleton/PostSkeleton.tsx";
 import {NotFound} from "../../../../shared/ui/NotFound.tsx";
+import {ActionModal} from "../../../../shared/ui/ActionModal.tsx";
+import {useState} from "react";
 
 export function PostInfoPage() {
+
+    const [modalVisible, setModalVisible] = useState(false);
 
     const {id} = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -26,6 +30,14 @@ export function PostInfoPage() {
     return (
         <div>
 
+            {modalVisible && <ActionModal
+                isLoading={del.isLoading}
+                submittingText={"Deleting..."}
+                onSubmit={onDeletePost}
+                buttonName={"Delete"}
+                onCancel={() => setModalVisible(false)}
+            />}
+
             <nav className="flex justify-between pb-3">
                 <ReturnLink name={"← Back to Posts list"} to={'/posts'}/>
                 <div className="grid grid-cols-2 gap-x-5">
@@ -40,9 +52,7 @@ export function PostInfoPage() {
                             variant={"danger"}
                             buttonName={"Delete"}
                             disabled={isLoading}
-                            isSubmitting={del.isLoading}
-                            submittingText={"Deleting..."}
-                            onClick={onDeletePost}/>
+                            onClick={() => setModalVisible(true)}/>
                 </div>
             </nav>
 
