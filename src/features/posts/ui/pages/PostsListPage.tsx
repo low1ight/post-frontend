@@ -30,7 +30,7 @@ export function PostsListPage() {
         fetchNextPage()
     }
 
-    if (!isFetchingNextPage && !data || isError) return <NotFound/>;
+    if (!isLoading && !data || isError) return <NotFound/>;
 
     return (
         <div>
