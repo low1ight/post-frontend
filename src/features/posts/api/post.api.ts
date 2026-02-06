@@ -7,36 +7,39 @@ import type {UpdatePostType} from "../model/types/updatePost.type.ts";
 
 type GetAllPostsQuery = {
     titleSearchTerm: string
-    pageNumber: number
-    pageSize:number
+    pageSize: number
 }
+
 
 export const postsApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
 
-        getAllPosts: builder.query<PaginatorType<PostType>, GetAllPostsQuery>({
-            query: ({titleSearchTerm,pageSize,pageNumber}:GetAllPostsQuery) =>
-                `posts?TitleSearchTerm=${titleSearchTerm}&PageNumber=${pageNumber}&PageSize=${pageSize}`,
-            serializeQueryArgs: ({ endpointName }) => {
-                return endpointName;
-            },
-            merge: (currentCache, newItems) => {
-                currentCache.items.push(...newItems.items);
-                currentCache.pageNumber = newItems.pageNumber;
-            },
-            forceRefetch({ currentArg, previousArg }) {
-                return currentArg !== previousArg;
-            },
-            providesTags: (result) =>
-                result
-                    ? [...result.items.map(({id}) => ({type: 'Posts' as const, id})), {type: 'Posts', id: 'LIST'}]
-                    : [{type: 'Posts', id: 'LIST'}],
+        getAllPosts: builder.infiniteQuery<PaginatorType<PostType>, GetAllPostsQuery, number>({
+            infiniteQueryOptions: {
+                initialPageParam: 1,
+                getNextPageParam: ({pageNumber, pageSize, totalItemsCount}: PaginatorType<PostType>) => {
+                    if (pageNumber < Math.ceil(totalItemsCount / pageSize)) {
+                        return pageNumber + 1
+                    }
+                    return undefined
 
-        }),
+                },
+            },
+            query({queryArg, pageParam}) {
+                return {
+                    url: "posts",
+                    params: {
+                        titleSearchTerm: queryArg.titleSearchTerm,
+                        pageSize: queryArg.pageSize,
+                        pageNumber: pageParam
+                    }
+                }
+
+            }}),
 
         getPostById: builder.query<PostType, string>({
             query: (id) => `posts/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Posts', id }]
+            providesTags: (result, error, id) => [{type: 'Posts', id}]
         }),
 
         createPost: builder.mutation<PostType, CreatePostType>({
@@ -45,25 +48,25 @@ export const postsApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: newPost,
             }),
-            invalidatesTags: [{ type: 'Posts', id: 'LIST' }],
+            invalidatesTags: [{type: 'Posts', id: 'LIST'}],
         }),
 
-        deletePostById: builder.mutation<{success:boolean}, string>({
-            query: (id:string) => ({
+        deletePostById: builder.mutation<{ success: boolean }, string>({
+            query: (id: string) => ({
                 url: `posts/${id}`,
                 method: 'DELETE',
             }),
-            invalidatesTags: [{ type: 'Posts', id: 'LIST' }]
+            invalidatesTags: [{type: 'Posts', id: 'LIST'}]
         }),
 
-        updatePostById: builder.mutation<{success:boolean}, UpdatePostType>({
+        updatePostById: builder.mutation<{ success: boolean }, UpdatePostType>({
             query: ({id, ...post}) => ({
                 url: `posts/${id}`,
                 method: 'PUT',
                 body: post
             }),
             invalidatesTags: (result, error, {id}) =>
-                [{ type: 'Posts', id }],
+                [{type: 'Posts', id}],
         }),
 
 
@@ -72,7 +75,7 @@ export const postsApi = baseApi.injectEndpoints({
 
 
 export const {
-    useGetAllPostsQuery,
+    useGetAllPostsInfiniteQuery,
     useGetPostByIdQuery,
     useUpdatePostByIdMutation,
     useDeletePostByIdMutation,

@@ -1,7 +1,7 @@
 import {Post} from "../components/Post.tsx";
 import type {PostType} from "../../model/post.type.ts";
 import {Link} from "react-router-dom";
-import {useGetAllPostsQuery} from "../../api/post.api.ts";
+import {useGetAllPostsInfiniteQuery} from "../../api/post.api.ts";
 import {AddNewPostFabButton} from "../components/AddNewPostFab.tsx";
 import {useState} from "react";
 import {useDebounce} from "../../../../shared/hooks/useDebounce.ts";
@@ -16,23 +16,21 @@ export function PostsListPage() {
     const [inputValue, setInputValue] = useState("")
     const debounce = useDebounce(inputValue, 500)
 
-    const [page, setPage] = useState(1);
-
-
     const {
         data,
+        isFetchingNextPage,
         isLoading,
-        error
-    } = useGetAllPostsQuery({titleSearchTerm: debounce, pageSize: PAGE_SIZE, pageNumber: page});
-
-
-    const isNewPageAvailable = data && Math.ceil(data.totalItemsCount / PAGE_SIZE) > page
+        isError,
+        fetchNextPage,
+        hasNextPage,
+    } = useGetAllPostsInfiniteQuery({titleSearchTerm: debounce, pageSize: PAGE_SIZE});
 
     const loadNextPage = () => {
-        if (!isLoading && isNewPageAvailable) setPage(page + 1)
+        if (isFetchingNextPage || !hasNextPage) return
+        fetchNextPage()
     }
 
-    if (!isLoading && !data || error) return <NotFound />;
+    if (!isFetchingNextPage && !data || isError) return <NotFound/>;
 
     return (
         <div>
@@ -52,8 +50,7 @@ export function PostsListPage() {
 
                 :
                 <Virtuoso useWindowScroll
-                          style={{height: '100vh'}}
-                          data={data?.items || []}
+                          data={data?.pages.flatMap(page => page.items) || []}
                           endReached={loadNextPage}
                           itemContent={(index, post: PostType) => (
                               <div className="mb-4">
