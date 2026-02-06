@@ -6,6 +6,7 @@ import {yupResolver} from "@hookform/resolvers/yup";
 import {useCreatePostMutation} from "../../api/post.api.ts";
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 import toast from "react-hot-toast";
+import {actionErrorHandler} from "../../../../shared/utils/actionErrorHandler.ts";
 
 export function CreatePostPage() {
 
@@ -18,17 +19,14 @@ export function CreatePostPage() {
         defaultValues: defaultValues,
     });
 
+
     const onSubmit: SubmitHandler<PostFormValues> = async (data) => {
         try {
             const result = await createPost(data)
             navigate(`/posts/${result.data}`);
             toast.success("Created!")
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error(error.message);
-            } else {
-                toast.error("An unexpected error occurred");
-            }
+            actionErrorHandler(error)
         }
     }
 

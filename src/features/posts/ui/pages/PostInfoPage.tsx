@@ -9,6 +9,7 @@ import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 import {ActionModal} from "../../../../shared/ui/ActionModal.tsx";
 import {useState} from "react";
 import toast from "react-hot-toast";
+import {actionErrorHandler} from "../../../../shared/utils/actionErrorHandler.ts";
 
 export function PostInfoPage() {
 
@@ -20,19 +21,13 @@ export function PostInfoPage() {
     const {data, isLoading, error} = useGetPostByIdQuery(id!)
     const [deletePost, del] = useDeletePostByIdMutation()
 
-
     const onDeletePost = async () => {
         try {
-
-            await deletePost(id!)
+            await deletePost(id!).unwrap()
             navigate('/posts')
             toast.success("Deleted")
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error(error.message);
-            } else {
-                toast.error("An unexpected error occurred");
-            }
+            actionErrorHandler(error)
         }
     }
 

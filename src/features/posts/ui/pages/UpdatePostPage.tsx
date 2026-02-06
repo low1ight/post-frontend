@@ -7,6 +7,7 @@ import {useGetPostByIdQuery, useUpdatePostByIdMutation} from "../../api/post.api
 import {ReturnLink} from "../../../../shared/ui/ReturnLink.tsx";
 import {NotFound} from "../../../../shared/ui/NotFound.tsx";
 import toast from "react-hot-toast";
+import {actionErrorHandler} from "../../../../shared/utils/actionErrorHandler.ts";
 
 export function UpdatePostPage() {
 
@@ -37,11 +38,7 @@ export function UpdatePostPage() {
             navigate(`/posts/${id}`);
             toast.success("Updated!")
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error(error.message);
-            } else {
-                toast.error("An unexpected error occurred");
-            }
+            actionErrorHandler(error)
         }
     };
 
